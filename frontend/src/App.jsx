@@ -86,7 +86,7 @@ function AlertPanel({ tickers, watchlist, rules, onAdd, onRemove }) {
 
   function handleSubmit(e) {
     e.preventDefault()
-    const price = Number(targetPrice.replace(/,/g, ''))
+    const price = Number(targetPrice.replace(/,/g, '')) || currentPrice
     if (!price || price <= 0) return
     onAdd({ code, condition, targetPrice: price })
     setTargetPrice('')
