@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
-const API = 'http://localhost:8080'
+const API = import.meta.env.VITE_API_URL ?? ''
 const DEFAULT_WATCHLIST = ['KRW-BTC', 'KRW-ETH', 'KRW-XRP', 'KRW-SOL', 'KRW-DOGE', 'KRW-ADA', 'KRW-AVAX', 'KRW-DOT']
 const LS_WATCHLIST = 'coinflux-watchlist'
 const LS_SELECTED  = 'coinflux-selected'
@@ -192,6 +192,13 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false)
   const toastTimer = useRef({})
 
+  // 브라우저 알림 권한 요청
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+  }, [])
+
   // Upbit 마켓 목록 로드 (한 번)
   useEffect(() => {
     fetch(`${API}/api/markets`)
@@ -220,6 +227,13 @@ export default function App() {
       const toast = { ...event, id: Date.now() }
       setToasts((prev) => [...prev, toast])
       toastTimer.current[toast.id] = setTimeout(() => dismissToast(toast.id), 5000)
+
+      if (Notification.permission === 'granted') {
+        new Notification(`${event.code.replace('KRW-', '')} 목표가 도달`, {
+          body: `₩${formatPrice(event.actualPrice)} (목표 ${event.condition === 'ABOVE' ? '이상' : '이하'} ₩${formatPrice(event.targetPrice)})`,
+          icon: '/favicon.ico',
+        })
+      }
     })
     return () => es.close()
   }, [])
