@@ -227,7 +227,6 @@ export default function App() {
       const toast = { ...event, id: Date.now() }
       setToasts((prev) => [...prev, toast])
       toastTimer.current[toast.id] = setTimeout(() => dismissToast(toast.id), 5000)
-      setRules((prev) => prev.filter((r) => r.id !== event.ruleId))
 
       if (Notification.permission === 'granted') {
         new Notification(`${event.code.replace('KRW-', '')} 목표가 도달`, {
